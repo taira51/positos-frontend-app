@@ -34,6 +34,7 @@ class MyApp extends StatelessWidget {
       },
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        fontFamily: 'NotoSansJP',
       ),
       home: const MyHomePage(title: 'タスクリスト'),
     );
