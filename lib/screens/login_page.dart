@@ -23,9 +23,9 @@ class _LoginPageState extends State<LoginPage> {
         password: password,
       );
 
-      // ログイン成功でTODO一覧画面に遷移する
+      // ログイン成功でタスク一覧画面に遷移する
        if (!mounted) return;
-        Navigator.pushReplacementNamed(context, '/todo_list');
+        Navigator.pushReplacementNamed(context, '/task_list');
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message ?? 'ログインに失敗しました。メールアドレスまたはパスワードをご確認ください。';

@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
+
 import 'screens/login_page.dart';
 import 'screens/account_register_page.dart';
-import 'screens/todo_list_page.dart';
+import 'screens/task_list_page.dart';
 
 void main() async  {
   WidgetsFlutterBinding.ensureInitialized(); // 非同期処理の前に必要
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -22,18 +25,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'TODOリスト',
+      title: 'タスクリスト',
       initialRoute: '/login',
       routes: {
         '/login': (context) => const LoginPage(),
         '/register': (context) => const AccountRegisterPage(),
-        '/todo_list': (context) => const TodoListPage(),
-        // '/todo_register': (context) => const TodoRegisterPage(),
+        '/task_list': (context) => const TaskListPage(),
       },
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'TODOリスト'),
+      home: const MyHomePage(title: 'タスクリスト'),
     );
   }
 }
