@@ -1,5 +1,5 @@
 class Task {
-  final int taskId;
+  final int? taskId;
   final String taskName;
   final int taskStatus;
 
@@ -18,10 +18,6 @@ class Task {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'taskId': taskId,
-      'taskName': taskName,
-      'taskStatus': taskStatus,
-    };
+    return {'taskId': taskId, 'taskName': taskName, 'taskStatus': taskStatus};
   }
 }
