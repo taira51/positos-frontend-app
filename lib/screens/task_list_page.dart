@@ -1,7 +1,9 @@
+import 'package:ai_todo_list_frontend_app/enums/task_status.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'dart:convert';
 
@@ -22,13 +24,13 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
   late final TaskService taskService; // タスクサービス
 
   // 入力フォーム
-  final taskInputController = TextEditingController(); // タスク入力フォーム
-  final memoController = TextEditingController(); // メモ入力フォーム
+  final taskGenerateInputController = TextEditingController(); // タスク入力フォーム
 
   // フォーカス
-  final _taskInputFocusNode = FocusNode();
+  final _taskGenerateInputFocusNode = FocusNode();
 
   // タスク一覧
+  // タスク順番（taskOrder）の値の降順でタスクを一覧表示する
   List<Task> taskList = [];
 
   // 提案タスク一覧
@@ -52,9 +54,8 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
   // ウィジェット破棄（ライフサイクル）
   @override
   void dispose() {
-    taskInputController.dispose();
-    memoController.dispose();
-    _taskInputFocusNode.dispose();
+    taskGenerateInputController.dispose();
+    _taskGenerateInputFocusNode.dispose();
     super.dispose();
   }
 
@@ -68,7 +69,7 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
 
   // 生成ボタン押下
   void generateSuggestion() async {
-    final text = taskInputController.text.trim();
+    final text = taskGenerateInputController.text.trim();
 
     if (text.isEmpty) {
       // タスク入力フォームが空の場合はSnackBarを表示して入力を促す
@@ -77,13 +78,20 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
       ).showSnackBar(SnackBar(content: Text('入力欄が空です。何か入力してください。')));
 
       // フォーカスはタスク入力フォームに戻す
-      _taskInputFocusNode.requestFocus();
+      _taskGenerateInputFocusNode.requestFocus();
     } else {
       // 入力がある場合はタスクを生成し、提案タスク一覧に加える
-      final suggestionTaskList = await taskService.generateTasks(text);
+      final responseSuggestionTaskList = await taskService.generateTasks(text);
 
       setState(() {
-        taskList = suggestionTaskList + taskList;
+        for (final suggestion in responseSuggestionTaskList) {
+          if (!suggestionTaskList.any(
+            (existing) => existing.taskName == suggestion.taskName,
+          )) {
+            // タスク名が重複していないものだけ追加する
+            suggestionTaskList.add(suggestion);
+          }
+        }
       });
     }
   }
@@ -104,43 +112,15 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
   }
 
   // タスク登録ボタン押下
-  void registerTask() {
+  void registerTask(Task task, Task removeSuggestionTask) async {
+    
+    // タスク登録APIリクエスト
+    final createResponseTask = await taskService.createTask(task);
 
-    // taskService.createTask();
-
-    if (suggestion.isNotEmpty && selectedDate != null) {
-      setState(() {
-        // taskList.add({
-        //   'task': suggestion,
-        //   'memo': memoController.text,
-        //   'date': DateFormat('yyyy/MM/dd').format(selectedDate!),
-        // });
-        // 入力クリア
-        taskInputController.clear();
-        memoController.clear();
-        selectedDate = null;
-      });
-    }
-  }
-
-  //
-  Future<void> requestApiPostTask(
-    String task,
-    String memo,
-    String deadline,
-  ) async {
-    final url = Uri.parse('http://localhost:8000/tasks');
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'task': task, 'memo': memo, 'deadline': deadline}),
-    );
-
-    if (response.statusCode == 200) {
-      print('登録成功: ${response.body}');
-    } else {
-      print('登録失敗: ${response.statusCode} ${response.body}');
-    }
+    setState(() {
+      suggestionTaskList.remove(removeSuggestionTask);
+      taskList.insert(0, createResponseTask);
+    });
   }
 
   @override
@@ -161,8 +141,8 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
-              controller: taskInputController,
-              focusNode: _taskInputFocusNode,
+              controller: taskGenerateInputController,
+              focusNode: _taskGenerateInputFocusNode,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 hintText: '来週プレゼンの準備をしなきゃ',
@@ -175,36 +155,125 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
             ),
             if (suggestionTaskList.isNotEmpty) ...[
               const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(border: Border.all()),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('生成されたタスク候補：'),
-                    Text('・タスク名: $suggestion'),
-                    Text(
-                      '・期限: ${selectedDate != null ? DateFormat('yyyy/MM/dd').format(selectedDate!) : '未設定'}',
-                    ),
-                    Text('・メモ: ${memoController.text}'),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: memoController,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: 'メモを入力',
+              ...suggestionTaskList.map((suggestion) {
+                final taskController = TextEditingController(); // タスク入力フォーム
+                final memoController = TextEditingController(); // メモ入力フォーム
+
+                taskController.text = suggestion.taskName;
+                DateTime? selectedDate;
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(border: Border.all()),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Text('生成されたタスク候補'),
+                          const Spacer(),
+                          IconButton(
+                            icon: const Icon(Icons.close),
+                            tooltip: 'この候補を削除',
+                            onPressed: () {
+                              setState(() {
+                                suggestionTaskList.remove(suggestion);
+                              });
+                            },
+                          ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextButton(onPressed: pickDate, child: const Text('期限を選択')),
-                    const SizedBox(height: 8),
-                    ElevatedButton(
-                      onPressed: registerTask,
-                      child: const Text('この内容で登録'),
-                    ),
-                  ],
-                ),
-              ),
+                      const SizedBox(height: 8),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SizedBox(width: 80, child: Text('タスク名：')),
+                          Expanded(
+                            child: TextField(
+                              controller: taskController,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                hintText: 'タスク名を入力',
+                                contentPadding: EdgeInsets.symmetric(
+                                  vertical: 8,
+                                  horizontal: 12,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SizedBox(width: 80, child: Text('メモ：')),
+                          Expanded(
+                            child: TextField(
+                              controller: memoController,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                hintText: 'メモを入力',
+                                contentPadding: EdgeInsets.symmetric(
+                                  vertical: 8,
+                                  horizontal: 12,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SizedBox(width: 80, child: Text('期限：')),
+                          Text(
+                            selectedDate != null
+                                ? DateFormat('yyyy/MM/dd').format(selectedDate!)
+                                : '未設定',
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              final date = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime.now().subtract(
+                                  const Duration(days: 365),
+                                ),
+                                lastDate: DateTime.now().add(
+                                  const Duration(days: 365),
+                                ),
+                              );
+                              if (date != null) {
+                                setState(() {
+                                  selectedDate = date;
+                                });
+                              }
+                            },
+                            child: const Text('期限を選択'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: () {
+                          final task = Task(
+                            taskName: taskController.text,
+                            taskStatus: TaskStatus.notStarted,
+                            taskOrder: taskList.length + 1,
+                            taskMemo: memoController.text,
+                            taskDeadline: selectedDate,
+                            createUserId: FirebaseAuth.instance.currentUser?.uid.toString()
+                          );
+                          registerTask(task, suggestion);
+                          },
+                        child: const Text('+ この内容で登録'),
+                      ),
+                    ],
+                  ),
+                );
+              }),
             ],
             const SizedBox(height: 24),
             ...taskList.map(
