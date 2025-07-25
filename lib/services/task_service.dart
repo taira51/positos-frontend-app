@@ -23,6 +23,13 @@ class TaskService {
     return Task.fromJson(data);
   }
 
+  // 更新
+  Future<Task> updateTask(Task task) async {
+    final id = task.taskId;
+    final data = await api.put('/tasks/$id', task.toJson());
+    return Task.fromJson(data);
+  }
+
   // 削除
   Future<void> deleteTask(String id) async {
     await api.delete('/tasks/$id');

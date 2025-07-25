@@ -2,37 +2,37 @@ import 'package:ai_todo_list_frontend_app/enums/task_status.dart';
 
 class Task {
   /// タスクID
-  final int? taskId;
+  int? taskId;
 
   /// タスク名
-  final String taskName;
+  String taskName;
 
   /// タスクステータス
-  final TaskStatus? taskStatus;
+  TaskStatus? taskStatus;
 
   /// タスク順番
-  final int? taskOrder;
+  int? taskOrder;
 
   /// タスクメモ
-  final String? taskMemo;
+  String? taskMemo;
 
   /// タスク期限日時
-  final DateTime? taskDeadline;
+  DateTime? taskDeadline;
 
   /// タスク完了者ID（Firebase UID）
-  final String? taskCompletedUserId;
+  String? taskCompletedUserId;
 
   /// 作成者ユーザーID（Firebase UID）
-  final String? createUserId;
+  String? createUserId;
 
   /// 作成日時
-  final DateTime? createDateTime;
+  DateTime? createDateTime;
 
   /// 更新ユーザーID（Firebase UID）
-  final String? updateUserId;
+  String? updateUserId;
 
   /// 更新日時
-  final DateTime? updateDateTime;
+  DateTime? updateDateTime;
 
   Task({
     this.taskId,

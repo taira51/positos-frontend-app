@@ -28,6 +28,20 @@ class ApiService {
     return jsonDecode(utf8.decode(response.bodyBytes));
   }
 
+  // 更新
+  Future<Map<String, dynamic>> put(
+    String endpoint,
+    Map<String, dynamic> body,
+  ) async {
+    final response = await http.put(
+      Uri.parse('$baseUrl$endpoint'),
+      headers: headers,
+      body: jsonEncode(body),
+    );
+    handleError(response);
+    return jsonDecode(utf8.decode(response.bodyBytes));
+  }
+
   // 削除
   Future<void> delete(String endpoint) async {
     final response = await http.delete(Uri.parse('$baseUrl$endpoint'));

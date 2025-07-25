@@ -1,11 +1,8 @@
 import 'package:ai_todo_list_frontend_app/enums/task_status.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
-import 'dart:convert';
 
 import 'package:ai_todo_list_frontend_app/providers/task_providers.dart';
 import 'package:ai_todo_list_frontend_app/services/task_service.dart';
@@ -24,7 +21,8 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
   late final TaskService taskService; // タスクサービス
 
   // 入力フォーム
-  final taskGenerateInputController = TextEditingController(); // タスク入力フォーム
+  final taskGenerateInputController =
+      TextEditingController(); // 生成タスクプロンプト入力フォーム
 
   // フォーカス
   final _taskGenerateInputFocusNode = FocusNode();
@@ -38,6 +36,8 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
 
   String suggestion = '';
   DateTime? selectedDate;
+
+  // ------------ ライフサイクル ------------
 
   // 初期化（ライフサイクル）
   @override
@@ -59,6 +59,64 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
     super.dispose();
   }
 
+  // ------------ ライフサイクル ------------
+  // ------------ イベント ------------
+
+  // 生成ボタン押下
+  void onPressedGenerateSuggestionButton() {
+    generateSuggestion();
+  }
+
+  // 提案タスク削除ボタン押下
+  void onClickRemoveSuggestButton(Task removeTask) {
+    removeSuggestionTask(removeTask);
+  }
+
+  // 日付入力（カレンダー使用）
+  void onPickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null) {
+      setState(() {
+        selectedDate = picked;
+      });
+    }
+  }
+
+  // タスク登録ボタン押下
+  void onPressedRegisterButton(Task task, Task suggestion) async {
+    // タスク登録APIリクエスト
+    final createResponseTask = await taskService.createTask(task);
+
+    setState(() {
+      // 提案タスクリストから削除し、タスク一覧に加える
+      removeSuggestionTask(suggestion);
+      taskList.insert(0, createResponseTask);
+    });
+  }
+
+  // チェックボックス切り替え
+  void onChangedCheckBox(Task task, TaskStatus taskStatus) {
+    updateTaskStatus(task, taskStatus);
+  }
+
+  // タスク完了ボタン押下
+  onClickCompleteButton(Task task, TaskStatus taskStatus) {
+    updateTaskStatus(task, taskStatus);
+  }
+
+  // タスク削除ボタン押下
+  onClickDeleteTaskButton(Task delete) {
+    deleteTask(delete);
+  }
+
+  // ------------ イベント ------------
+  // ------------ 処理 ------------
+
   // 初期表示ロード
   void _loadTasks() async {
     final responseTasks = await taskService.fetchTasks();
@@ -67,7 +125,7 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
     });
   }
 
-  // 生成ボタン押下
+  // タスクを生成する
   void generateSuggestion() async {
     final text = taskGenerateInputController.text.trim();
 
@@ -96,32 +154,54 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
     }
   }
 
-  // 日付入力（カレンダー使用）
-  void pickDate() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2100),
-    );
-    if (picked != null) {
-      setState(() {
-        selectedDate = picked;
-      });
+  // 提案タスクリストからタスクを削除する
+  void removeSuggestionTask(Task removeTask) {
+    setState(() {
+      suggestionTaskList.remove(removeTask);
+
+      if (suggestionTaskList.isEmpty) {
+        // 提案タスクリストが空になったらタスク生成プロンプトの入力フォームをクリアする
+        taskGenerateInputController.clear();
+      }
+    });
+  }
+
+  // タスクステータス更新
+  Future<void> updateTaskStatus(Task task, TaskStatus updateTaskStatus) async {
+    // 値とビューの更新
+    setState(() {
+      task.taskStatus = updateTaskStatus;
+    });
+
+    try {
+      // タスク更新APIリクエスト
+      await taskService.updateTask(task);
+    } catch (e) {
+      // エラー処理
+      print('ステータス更新失敗: $e');
+      // 必要に応じて元に戻す or スナックバー表示など
     }
   }
 
-  // タスク登録ボタン押下
-  void registerTask(Task task, Task removeSuggestionTask) async {
-    
-    // タスク登録APIリクエスト
-    final createResponseTask = await taskService.createTask(task);
+  // タスク削除
+  Future<void> deleteTask(Task task) async {
+    try {
+      // タスク削除APIリクエスト
+      await taskService.deleteTask(task.taskId.toString());
 
-    setState(() {
-      suggestionTaskList.remove(removeSuggestionTask);
-      taskList.insert(0, createResponseTask);
-    });
+      setState(() {
+        // タスク一覧から対象のタスクを削除
+        taskList.remove(task);
+      });
+    } catch (e) {
+      // エラー処理
+      print('タスク削除失敗: $e');
+      // 必要に応じて元に戻す or スナックバー表示など
+    }
   }
+
+  // ------------ 処理 ------------
+  // ------------ ウィジェット ------------
 
   @override
   Widget build(BuildContext context) {
@@ -175,11 +255,8 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
                           IconButton(
                             icon: const Icon(Icons.close),
                             tooltip: 'この候補を削除',
-                            onPressed: () {
-                              setState(() {
-                                suggestionTaskList.remove(suggestion);
-                              });
-                            },
+                            onPressed: () =>
+                                onClickRemoveSuggestButton(suggestion),
                           ),
                         ],
                       ),
@@ -264,10 +341,11 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
                             taskOrder: taskList.length + 1,
                             taskMemo: memoController.text,
                             taskDeadline: selectedDate,
-                            createUserId: FirebaseAuth.instance.currentUser?.uid.toString()
+                            createUserId: FirebaseAuth.instance.currentUser?.uid
+                                .toString(),
                           );
-                          registerTask(task, suggestion);
-                          },
+                          onPressedRegisterButton(task, suggestion);
+                        },
                         child: const Text('+ この内容で登録'),
                       ),
                     ],
@@ -278,12 +356,73 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
             const SizedBox(height: 24),
             ...taskList.map(
               (task) => ListTile(
-                leading: const Checkbox(value: false, onChanged: null),
+                leading: Checkbox(
+                  value: task.taskStatus != TaskStatus.notStarted,
+                  onChanged: task.taskStatus == TaskStatus.completed
+                      ? null // 完了ステータスなら無効（非活性）
+                      : (value) {
+                          task.taskStatus == TaskStatus.notStarted
+                              ? onChangedCheckBox(task, TaskStatus.inProgress)
+                              : onChangedCheckBox(task, TaskStatus.notStarted);
+                        },
+                ),
                 title: Text(task.taskName),
-                // subtitle: Text('メモ: ${Task['memo'] ?? ''}\n期限: ${Task['date'] ?? ''}'),
-                trailing: OutlinedButton(
-                  onPressed: () {},
-                  child: const Text('完了'),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    OutlinedButton(
+                      onPressed: task.taskStatus == TaskStatus.notStarted
+                          ? null // タスクステータスが「未着手」の場合、非活性にする
+                          : () => {
+                              task.taskStatus == TaskStatus.inProgress
+                                  ? onClickCompleteButton(
+                                      task,
+                                      TaskStatus.completed,
+                                    )
+                                  : onClickCompleteButton(
+                                      task,
+                                      TaskStatus.inProgress,
+                                    ),
+                            },
+                      child: Text(
+                        // タスクステータス"1"：未着手 ⇒ 非活性（完了）
+                        // タスクステータス"2"：作業中 ⇒ 活性（完了）
+                        // タスクステータス"3"：完了 ⇒ 活性（戻す）
+                        task.taskStatus != TaskStatus.completed ? '完了' : '戻す',
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    // 削除アイコン
+                    IconButton(
+                      icon: const Icon(Icons.delete),
+                      tooltip: 'タスクを削除',
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                            title: const Text('削除確認'),
+                            content: const Text('このタスクを削除しますか？'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('キャンセル'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  onClickDeleteTaskButton(task);
+                                  Navigator.pop(context);
+                                },
+                                child: const Text(
+                                  '削除',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -292,4 +431,6 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
       ),
     );
   }
+
+  // ------------ ウィジェット ------------
 }
