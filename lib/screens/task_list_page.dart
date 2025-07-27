@@ -1,4 +1,5 @@
 import 'package:ai_todo_list_frontend_app/enums/task_status.dart';
+import 'package:ai_todo_list_frontend_app/widgets/common_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -206,15 +207,8 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('TODOアプリ'),
-        actions: [
-          const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Center(child: Text('[ChatGPT連携あり]')),
-          ),
-        ],
-      ),
+      backgroundColor: Colors.white,
+      appBar: buildCommonAppBar(context: context, showBackButton: false),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -241,190 +235,178 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
 
                 taskController.text = suggestion.taskName;
                 DateTime? selectedDate;
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(border: Border.all()),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Text('生成されたタスク候補'),
-                          const Spacer(),
-                          IconButton(
-                            icon: const Icon(Icons.close),
-                            tooltip: 'この候補を削除',
-                            onPressed: () =>
-                                onClickRemoveSuggestButton(suggestion),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SizedBox(width: 80, child: Text('タスク名：')),
-                          Expanded(
-                            child: TextField(
-                              controller: taskController,
-                              decoration: const InputDecoration(
-                                border: OutlineInputBorder(),
-                                hintText: 'タスク名を入力',
-                                contentPadding: EdgeInsets.symmetric(
-                                  vertical: 8,
-                                  horizontal: 12,
-                                ),
-                              ),
+                return Card(
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Text('生成されたタスク候補'),
+                            const Spacer(),
+                            IconButton(
+                              icon: const Icon(Icons.close),
+                              tooltip: 'この候補を削除',
+                              onPressed: () =>
+                                  onClickRemoveSuggestButton(suggestion),
                             ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: taskController,
+                          decoration: const InputDecoration(
+                            floatingLabelBehavior: FloatingLabelBehavior.always,
+                            labelText: 'タスク名',
+                            hintText: 'タスク名を入力',
+                            border: OutlineInputBorder(),
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SizedBox(width: 80, child: Text('メモ：')),
-                          Expanded(
-                            child: TextField(
-                              controller: memoController,
-                              decoration: const InputDecoration(
-                                border: OutlineInputBorder(),
-                                hintText: 'メモを入力',
-                                contentPadding: EdgeInsets.symmetric(
-                                  vertical: 8,
-                                  horizontal: 12,
-                                ),
-                              ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: memoController,
+                          decoration: const InputDecoration(
+                            floatingLabelBehavior: FloatingLabelBehavior.always,
+                            labelText: 'メモ',
+                            hintText: 'メモを入力',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SizedBox(width: 80, child: Text('期限：')),
+                            Text(
+                              selectedDate != null
+                                  ? DateFormat('yyyy/MM/dd').format(selectedDate!)
+                                  : '未設定',
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SizedBox(width: 80, child: Text('期限：')),
-                          Text(
-                            selectedDate != null
-                                ? DateFormat('yyyy/MM/dd').format(selectedDate!)
-                                : '未設定',
-                          ),
-                          TextButton(
-                            onPressed: () async {
-                              final date = await showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime.now().subtract(
-                                  const Duration(days: 365),
-                                ),
-                                lastDate: DateTime.now().add(
-                                  const Duration(days: 365),
-                                ),
-                              );
-                              if (date != null) {
-                                setState(() {
-                                  selectedDate = date;
-                                });
-                              }
-                            },
-                            child: const Text('期限を選択'),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      ElevatedButton(
-                        onPressed: () {
-                          final task = Task(
-                            taskName: taskController.text,
-                            taskStatus: TaskStatus.notStarted,
-                            taskOrder: taskList.length + 1,
-                            taskMemo: memoController.text,
-                            taskDeadline: selectedDate,
-                            createUserId: FirebaseAuth.instance.currentUser?.uid
-                                .toString(),
-                          );
-                          onPressedRegisterButton(task, suggestion);
-                        },
-                        child: const Text('+ この内容で登録'),
-                      ),
-                    ],
+                            TextButton(
+                              onPressed: () async {
+                                final date = await showDatePicker(
+                                  context: context,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime.now().subtract(
+                                    const Duration(days: 365),
+                                  ),
+                                  lastDate: DateTime.now().add(
+                                    const Duration(days: 365),
+                                  ),
+                                );
+                                if (date != null) {
+                                  setState(() {
+                                    selectedDate = date;
+                                  });
+                                }
+                              },
+                              child: const Text('期限を選択'),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        ElevatedButton(
+                          onPressed: () {
+                            final task = Task(
+                              taskName: taskController.text,
+                              taskStatus: TaskStatus.notStarted,
+                              taskOrder: taskList.length + 1,
+                              taskMemo: memoController.text,
+                              taskDeadline: selectedDate,
+                              createUserId: FirebaseAuth.instance.currentUser?.uid
+                                  .toString(),
+                            );
+                            onPressedRegisterButton(task, suggestion);
+                          },
+                          child: const Text('+ この内容で登録'),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }),
             ],
             const SizedBox(height: 24),
             ...taskList.map(
-              (task) => ListTile(
-                leading: Checkbox(
-                  value: task.taskStatus != TaskStatus.notStarted,
-                  onChanged: task.taskStatus == TaskStatus.completed
-                      ? null // 完了ステータスなら無効（非活性）
-                      : (value) {
-                          task.taskStatus == TaskStatus.notStarted
-                              ? onChangedCheckBox(task, TaskStatus.inProgress)
-                              : onChangedCheckBox(task, TaskStatus.notStarted);
-                        },
-                ),
-                title: Text(task.taskName),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    OutlinedButton(
-                      onPressed: task.taskStatus == TaskStatus.notStarted
-                          ? null // タスクステータスが「未着手」の場合、非活性にする
-                          : () => {
-                              task.taskStatus == TaskStatus.inProgress
-                                  ? onClickCompleteButton(
-                                      task,
-                                      TaskStatus.completed,
-                                    )
-                                  : onClickCompleteButton(
-                                      task,
-                                      TaskStatus.inProgress,
-                                    ),
-                            },
-                      child: Text(
-                        // タスクステータス"1"：未着手 ⇒ 非活性（完了）
-                        // タスクステータス"2"：作業中 ⇒ 活性（完了）
-                        // タスクステータス"3"：完了 ⇒ 活性（戻す）
-                        task.taskStatus != TaskStatus.completed ? '完了' : '戻す',
+              (task) => Card(
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 2,
+                child: ListTile(
+                  leading: Checkbox(
+                    value: task.taskStatus != TaskStatus.notStarted,
+                    onChanged: task.taskStatus == TaskStatus.completed
+                        ? null // 完了ステータスなら無効（非活性）
+                        : (value) {
+                            task.taskStatus == TaskStatus.notStarted
+                                ? onChangedCheckBox(task, TaskStatus.inProgress)
+                                : onChangedCheckBox(task, TaskStatus.notStarted);
+                          },
+                  ),
+                  title: Text(task.taskName),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      OutlinedButton(
+                        onPressed: task.taskStatus == TaskStatus.notStarted
+                            ? null // タスクステータスが「未着手」の場合、非活性にする
+                            : () => {
+                                task.taskStatus == TaskStatus.inProgress
+                                    ? onClickCompleteButton(
+                                        task,
+                                        TaskStatus.completed,
+                                      )
+                                    : onClickCompleteButton(
+                                        task,
+                                        TaskStatus.inProgress,
+                                      ),
+                              },
+                        child: Text(
+                          // タスクステータス"1"：未着手 ⇒ 非活性（完了）
+                          // タスクステータス"2"：作業中 ⇒ 活性（完了）
+                          // タスクステータス"3"：完了 ⇒ 活性（戻す）
+                          task.taskStatus != TaskStatus.completed ? '完了' : '戻す',
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    // 削除アイコン
-                    IconButton(
-                      icon: const Icon(Icons.delete),
-                      tooltip: 'タスクを削除',
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (_) => AlertDialog(
-                            title: const Text('削除確認'),
-                            content: const Text('このタスクを削除しますか？'),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('キャンセル'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  onClickDeleteTaskButton(task);
-                                  Navigator.pop(context);
-                                },
-                                child: const Text(
-                                  '削除',
-                                  style: TextStyle(color: Colors.red),
+                      const SizedBox(width: 8),
+                      // 削除アイコン
+                      IconButton(
+                        icon: const Icon(Icons.delete),
+                        tooltip: 'タスクを削除',
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (_) => AlertDialog(
+                              title: const Text('削除確認'),
+                              content: const Text('このタスクを削除しますか？'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text('キャンセル'),
                                 ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+                                TextButton(
+                                  onPressed: () {
+                                    onClickDeleteTaskButton(task);
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text(
+                                    '削除',
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+            ),
             ),
           ],
         ),
