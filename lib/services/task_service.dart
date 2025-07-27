@@ -40,7 +40,7 @@ class TaskService {
     final response = await http.post(
       Uri.parse(ApiService.baseUrl + generateTasksUrl),
       headers: ApiService.headers,
-      body: jsonEncode({ 'prompt': prompt }),
+      body: jsonEncode({'prompt': prompt}),
     );
     api.handleError(response);
     return jsonDecode(

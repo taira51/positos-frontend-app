@@ -16,10 +16,7 @@ class CreateGroupPage extends StatelessWidget {
           children: [
             const Text(
               'Positosでグループを作成しましょう',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold
-              ),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             const Text(
@@ -30,9 +27,7 @@ class CreateGroupPage extends StatelessWidget {
             const Text('グループ名', style: TextStyle(fontSize: 16)),
             const SizedBox(height: 8),
             const TextField(
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-              ),
+              decoration: InputDecoration(border: OutlineInputBorder()),
             ),
             const SizedBox(height: 24),
             SizedBox(

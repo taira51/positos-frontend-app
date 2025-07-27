@@ -237,7 +237,9 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
                 DateTime? selectedDate;
                 return Card(
                   margin: const EdgeInsets.symmetric(vertical: 8),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   elevation: 2,
                   child: Padding(
                     padding: const EdgeInsets.all(16),
@@ -283,7 +285,9 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
                             SizedBox(width: 80, child: Text('期限：')),
                             Text(
                               selectedDate != null
-                                  ? DateFormat('yyyy/MM/dd').format(selectedDate!)
+                                  ? DateFormat(
+                                      'yyyy/MM/dd',
+                                    ).format(selectedDate!)
                                   : '未設定',
                             ),
                             TextButton(
@@ -317,7 +321,10 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
                               taskOrder: taskList.length + 1,
                               taskMemo: memoController.text,
                               taskDeadline: selectedDate,
-                              createUserId: FirebaseAuth.instance.currentUser?.uid
+                              createUserId: FirebaseAuth
+                                  .instance
+                                  .currentUser
+                                  ?.uid
                                   .toString(),
                             );
                             onPressedRegisterButton(task, suggestion);
@@ -334,7 +341,9 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
             ...taskList.map(
               (task) => Card(
                 margin: const EdgeInsets.symmetric(vertical: 8),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 elevation: 2,
                 child: ListTile(
                   leading: Checkbox(
@@ -344,7 +353,10 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
                         : (value) {
                             task.taskStatus == TaskStatus.notStarted
                                 ? onChangedCheckBox(task, TaskStatus.inProgress)
-                                : onChangedCheckBox(task, TaskStatus.notStarted);
+                                : onChangedCheckBox(
+                                    task,
+                                    TaskStatus.notStarted,
+                                  );
                           },
                   ),
                   title: Text(task.taskName),
@@ -406,7 +418,7 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
                     ],
                   ),
                 ),
-            ),
+              ),
             ),
           ],
         ),

@@ -1,8 +1,8 @@
 /// タスクステータスを管理するコード
 enum TaskStatus {
-  notStarted,  // 1
-  inProgress,  // 2
-  completed    // 3
+  notStarted, // 1
+  inProgress, // 2
+  completed, // 3
 }
 
 extension TaskStatusExtension on TaskStatus {

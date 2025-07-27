@@ -24,8 +24,8 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       // ログイン成功でタスク一覧画面に遷移する
-       if (!mounted) return;
-        Navigator.pushReplacementNamed(context, '/task_list');
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/task_list');
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message ?? 'ログインに失敗しました。メールアドレスまたはパスワードをご確認ください。';
@@ -78,19 +78,16 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 48),
                   errorMessage.isNotEmpty
-                  ? Text(
-                    errorMessage,
-                    style: const TextStyle(
-                      color: Colors.red,
-                      fontSize: 14,
-                    )
-                  )
-                  : const SizedBox(height: 20),
+                      ? Text(
+                          errorMessage,
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 14,
+                          ),
+                        )
+                      : const SizedBox(height: 20),
                   const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: login,
-                    child: const Text('ログイン'),
-                  ),
+                  ElevatedButton(onPressed: login, child: const Text('ログイン')),
                   const SizedBox(height: 8),
                   TextButton(
                     onPressed: navigateToRegister,

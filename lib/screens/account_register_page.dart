@@ -32,8 +32,8 @@ class _AccountRegisterPageState extends State<AccountRegisterPage> {
         password: password,
       );
       // 登録成功 → ログイン画面に戻す
-       if (!mounted) return;
-        Navigator.pop(context); // 戻る（ログイン画面へ）
+      if (!mounted) return;
+      Navigator.pop(context); // 戻る（ログイン画面へ）
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message ?? '登録に失敗しました';
@@ -92,19 +92,16 @@ class _AccountRegisterPageState extends State<AccountRegisterPage> {
                   ),
                   const SizedBox(height: 48),
                   errorMessage.isNotEmpty
-                  ? Text(
-                    errorMessage,
-                    style: const TextStyle(
-                      color: Colors.red,
-                      fontSize: 14,
-                    )
-                  )
-                  : const SizedBox(height: 20),
+                      ? Text(
+                          errorMessage,
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 14,
+                          ),
+                        )
+                      : const SizedBox(height: 20),
                   const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: register,
-                    child: const Text('登録'),
-                  ),
+                  ElevatedButton(onPressed: register, child: const Text('登録')),
                   if (errorMessage.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(top: 16),

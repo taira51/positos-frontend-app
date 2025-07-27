@@ -11,11 +11,9 @@ import 'screens/login_page.dart';
 import 'screens/account_register_page.dart';
 import 'screens/task_list_page.dart';
 
-void main() async  {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -25,7 +23,6 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
       title: 'Positos - タスク共有アプリ',
       locale: Locale('ja'),
@@ -48,7 +45,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         fontFamily: 'NotoSansJP',
-          textTheme: const TextTheme(
+        textTheme: const TextTheme(
           bodyLarge: TextStyle(color: Colors.blueGrey),
           bodyMedium: TextStyle(color: Colors.blueGrey),
           titleLarge: TextStyle(color: Colors.blueGrey),
