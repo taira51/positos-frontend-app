@@ -1,7 +1,7 @@
 import 'api_service.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:ai_todo_list_frontend_app/models/task.dart';
+import 'package:positos_frontend_app/models/task.dart';
 
 // タスクサービス
 class TaskService {

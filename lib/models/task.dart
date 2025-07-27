@@ -1,4 +1,4 @@
-import 'package:ai_todo_list_frontend_app/enums/task_status.dart';
+import 'package:positos_frontend_app/enums/task_status.dart';
 
 class Task {
   /// タスクID

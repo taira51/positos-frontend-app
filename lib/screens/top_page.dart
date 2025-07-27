@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ai_todo_list_frontend_app/widgets/common_app_bar.dart';
+import 'package:positos_frontend_app/widgets/common_app_bar.dart';
 
 import 'create_group_page.dart';
 

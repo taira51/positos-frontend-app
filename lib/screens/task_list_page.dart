@@ -1,13 +1,13 @@
-import 'package:ai_todo_list_frontend_app/enums/task_status.dart';
-import 'package:ai_todo_list_frontend_app/widgets/common_app_bar.dart';
+import 'package:positos_frontend_app/enums/task_status.dart';
+import 'package:positos_frontend_app/widgets/common_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'package:ai_todo_list_frontend_app/providers/task_providers.dart';
-import 'package:ai_todo_list_frontend_app/services/task_service.dart';
-import 'package:ai_todo_list_frontend_app/models/task.dart';
+import 'package:positos_frontend_app/providers/task_providers.dart';
+import 'package:positos_frontend_app/services/task_service.dart';
+import 'package:positos_frontend_app/models/task.dart';
 
 // タスク一覧ページ
 class TaskListPage extends ConsumerStatefulWidget {

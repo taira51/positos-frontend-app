@@ -1,6 +1,6 @@
 {
-    "name": "ai_todo_list_frontend_app",
-    "short_name": "ai_todo_list_frontend_app",
+    "name": "positos_frontend_app",
+    "short_name": "positos_frontend_app",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

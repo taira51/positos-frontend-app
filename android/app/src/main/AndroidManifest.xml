@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="ai_todo_list_frontend_app"
+        android:label="positos_frontend_app"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

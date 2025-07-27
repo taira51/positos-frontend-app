@@ -44,9 +44,12 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 /android/build/
+/android/app/google-services.json
+
 
 #Firebase関連
 lib/firebase_options.dart
+firebase.json
 
 #Flutterが自動生成するファイル（プラグイン登録コード）
 /linux/flutter/generated_plugin_registrant.cc
