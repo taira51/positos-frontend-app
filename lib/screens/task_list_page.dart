@@ -22,7 +22,7 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
   late final TaskService taskService; // タスクサービス
 
   // 入力フォーム
-  final taskGenerateInputController =
+  final _taskGenerateInputController =
       TextEditingController(); // 生成タスクプロンプト入力フォーム
 
   // フォーカス
@@ -55,7 +55,7 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
   // ウィジェット破棄（ライフサイクル）
   @override
   void dispose() {
-    taskGenerateInputController.dispose();
+    _taskGenerateInputController.dispose();
     _taskGenerateInputFocusNode.dispose();
     super.dispose();
   }
@@ -75,6 +75,7 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
 
   // 日付入力（カレンダー使用）
   void onPickDate() async {
+    // TODO カレンダーまわりは全く実装してない
     final picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -128,7 +129,7 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
 
   // タスクを生成する
   void generateSuggestion() async {
-    final text = taskGenerateInputController.text.trim();
+    final text = _taskGenerateInputController.text.trim();
 
     if (text.isEmpty) {
       // タスク入力フォームが空の場合はSnackBarを表示して入力を促す
@@ -162,7 +163,7 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
 
       if (suggestionTaskList.isEmpty) {
         // 提案タスクリストが空になったらタスク生成プロンプトの入力フォームをクリアする
-        taskGenerateInputController.clear();
+        _taskGenerateInputController.clear();
       }
     });
   }
@@ -215,7 +216,7 @@ class _TaskListPageState extends ConsumerState<TaskListPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
-              controller: taskGenerateInputController,
+              controller: _taskGenerateInputController,
               focusNode: _taskGenerateInputFocusNode,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),

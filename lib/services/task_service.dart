@@ -5,40 +5,43 @@ import 'package:positos_frontend_app/models/task.dart';
 
 // タスクサービス
 class TaskService {
-  static const String generateTasksUrl = '/generate_tasks';
+  // URL
+  static const String taskUrl = '/task';
+  static const String generateTasksUrl = '/generate';
 
   final ApiService api;
 
+  // コンストラクタ
   TaskService({required this.api});
 
   // 全件取得
   Future<List<Task>> fetchTasks() async {
-    final data = await api.get('/tasks');
+    final data = await api.get(taskUrl);
     return data.map<Task>((json) => Task.fromJson(json)).toList();
   }
 
   // 作成
   Future<Task> createTask(Task task) async {
-    final data = await api.post('/tasks', task.toJson());
+    final data = await api.post(taskUrl, task.toJson());
     return Task.fromJson(data);
   }
 
   // 更新
   Future<Task> updateTask(Task task) async {
     final id = task.taskId;
-    final data = await api.put('/tasks/$id', task.toJson());
+    final data = await api.put('$taskUrl/$id', task.toJson());
     return Task.fromJson(data);
   }
 
   // 削除
   Future<void> deleteTask(String id) async {
-    await api.delete('/tasks/$id');
+    await api.delete('$taskUrl/$id');
   }
 
   // タスク生成（ChatGPT API使用）
   Future<List<Task>> generateTasks(String prompt) async {
     final response = await http.post(
-      Uri.parse(ApiService.baseUrl + generateTasksUrl),
+      Uri.parse(ApiService.baseUrl + taskUrl + generateTasksUrl),
       headers: ApiService.headers,
       body: jsonEncode({'prompt': prompt}),
     );

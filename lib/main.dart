@@ -6,7 +6,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
 import 'screens/top_page.dart';
-import 'screens/create_group_page.dart';
+import 'screens/create_project_page.dart';
+import 'screens/project_page.dart';
 import 'screens/login_page.dart';
 import 'screens/account_register_page.dart';
 import 'screens/task_list_page.dart';
@@ -20,7 +21,6 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -29,14 +29,36 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.light,
 
       // router
-      home: const TopPage(),
-      initialRoute: '',
+      initialRoute: '/',
       routes: {
-        '': (context) => const TopPage(),
-        '/create_group': (context) => const CreateGroupPage(),
+        '/': (context) => const TopPage(),
+        '/create_project': (context) => const CreateProjectPage(),
         '/login': (context) => const LoginPage(),
         '/register': (context) => const AccountRegisterPage(),
         '/task_list': (context) => const TaskListPage(),
+      },
+      onGenerateRoute: (settings) {
+        final uri = Uri.parse(settings.name ?? '');
+
+        if (uri.pathSegments.length == 2 && uri.pathSegments[0] == 'project') {
+          final projectId = uri.pathSegments[1];
+          return MaterialPageRoute(
+            builder: (context) => ProjectPage(projectId: projectId),
+            settings: settings,
+          );
+        }
+
+        // それ以外のパス → NotFoundなど
+        return MaterialPageRoute(
+          builder: (context) => Scaffold(
+            body: Center(
+              child: Text(
+                // TODO トップページに戻るボタンを作る。
+                '指定したURLのプロジェクトが見つかりませんでした。\nURLが誤っているか、該当のプロジェクトが削除、もしくは非公開になっている可能性があります。',
+              ),
+            ),
+          ),
+        );
       },
 
       // theme
