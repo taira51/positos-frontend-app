@@ -18,6 +18,9 @@ class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
   // サービスクラス
   late final ProjectService projectService; // プロジェクト作成サービス
 
+  // エラーメッセージ
+  String errorMessage = '';
+
   // 入力フォーム
   final TextEditingController _projectNameInputController =
       TextEditingController(); // プロジェクト名入力フォーム
@@ -60,6 +63,15 @@ class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
 
   Future<void> createProject() async {
     final String projectName = _projectNameInputController.text;
+
+    if (projectName.trim().isEmpty) {
+      // プロジェクト名の入力が無い場合、エラーメッセージを表示して終了
+      setState(() {
+        errorMessage = 'プロジェクト名を入力してください';
+      });
+
+      return;
+    }
 
     final project = Project(projectName: projectName);
     final response = await projectService.createProject(project);
@@ -118,6 +130,18 @@ class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
                 child: const Text('プロジェクトを作成する'),
               ),
             ),
+            errorMessage.isNotEmpty
+                ? Padding(
+                    padding: EdgeInsets.only(top: 16),
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        errorMessage,
+                        style: const TextStyle(color: Colors.red, fontSize: 14),
+                      ),
+                    ),
+                  )
+                : const SizedBox(height: 20),
             const SizedBox(height: 48),
             const Divider(),
             const SizedBox(height: 24),
