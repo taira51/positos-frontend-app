@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:firebase_core/firebase_core.dart';
+import 'package:positos_frontend_app/const/common_const.dart';
 import 'firebase_options.dart';
 
 import 'screens/top_page.dart';
@@ -23,27 +24,35 @@ class MyApp extends StatelessWidget {
 
   // GoRouter 定義
   final _router = GoRouter(
-    initialLocation: '/',
+    initialLocation: CommonConstants.routeTop,
     routes: [
-      GoRoute(path: '/', builder: (context, state) => const TopPage()),
       GoRoute(
-        path: '/create_project',
-        builder: (context, state) => const CreateProjectPage(),
+        path: CommonConstants.routeTop,
+        builder: (context, state) => const TopPage(),
       ),
-      GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
       GoRoute(
-        path: '/register',
+        path: CommonConstants.routeLogin,
+        builder: (context, state) => const LoginPage(),
+      ),
+      GoRoute(
+        path: CommonConstants.routeLogin,
         builder: (context, state) => const AccountRegisterPage(),
       ),
       GoRoute(
-        path: '/task_list',
-        builder: (context, state) => const TaskListPage(),
+        path: CommonConstants.routeCreateProject,
+        builder: (context, state) => const CreateProjectPage(),
       ),
-      // 動的パラメータ /project/:projectId
       GoRoute(
-        path: '/project/:projectId',
-        builder: (context, state) =>
-            ProjectPage(projectId: state.pathParameters['projectId']!),
+        path:
+            '${CommonConstants.routeProject}/:${CommonConstants.pathParameterProjectId}',
+        builder: (context, state) => ProjectPage(
+          projectId:
+              state.pathParameters[CommonConstants.pathParameterProjectId]!,
+        ),
+      ),
+      GoRoute(
+        path: CommonConstants.routeTaskList,
+        builder: (context, state) => const TaskListPage(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

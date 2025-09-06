@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
+import 'package:positos_frontend_app/const/common_const.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -26,7 +27,7 @@ class _LoginPageState extends State<LoginPage> {
 
       // ログイン成功でタスク一覧画面に遷移する
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/task_list');
+      context.go(CommonConstants.routeTaskList);
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message ?? 'ログインに失敗しました。メールアドレスまたはパスワードをご確認ください。';
@@ -36,7 +37,7 @@ class _LoginPageState extends State<LoginPage> {
 
   // 会員登録ページに遷移する
   void navigateToRegister() {
-    context.go('/register');
+    context.go(CommonConstants.routeRegister);
   }
 
   @override

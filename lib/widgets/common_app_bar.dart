@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:positos_frontend_app/const/common_const.dart';
 
 /// 共通appBar
 /// showBackButton 戻るボタン表示制御（trueで表示する）
@@ -27,16 +28,16 @@ PreferredSizeWidget buildCommonAppBar({
     elevation: 0,
     actions: [
       TextButton(
-        onPressed: () => context.go('/login'),
+        onPressed: () => context.go(CommonConstants.routeLogin),
         child: const Text('ログイン'),
       ),
       TextButton(
-        onPressed: () => context.go('/signup'),
+        onPressed: () => context.go(CommonConstants.routeRegister),
         child: const Text('会員登録'),
       ),
       IconButton(
         icon: const Icon(Icons.settings),
-        onPressed: () => context.go('/settings'),
+        onPressed: () => context.go(CommonConstants.routeSettings),
       ),
     ],
   );

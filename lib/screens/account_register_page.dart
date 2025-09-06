@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
+import 'package:positos_frontend_app/const/common_const.dart';
 
 class AccountRegisterPage extends StatefulWidget {
   const AccountRegisterPage({super.key});
@@ -44,7 +45,7 @@ class _AccountRegisterPageState extends State<AccountRegisterPage> {
 
   // ログインページに遷移する
   void navigateToLogin() {
-    context.go('/login');
+    context.go(CommonConstants.routeLogin);
   }
 
   @override

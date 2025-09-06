@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:positos_frontend_app/const/common_const.dart';
 import 'package:positos_frontend_app/widgets/common_app_bar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:web/web.dart' as web;
@@ -23,7 +24,7 @@ class _TopPageState extends State<TopPage> {
     super.initState();
 
     // 参加したプロジェクト一覧をローカルストレージから取得
-    final joinedProject = web.window.localStorage['joined_project'];
+    final joinedProject = web.window.localStorage.getItem('joined_project');
 
     setState(() {
       if (joinedProject != null) {
@@ -42,7 +43,7 @@ class _TopPageState extends State<TopPage> {
 
   // プロジェクト作成ページに遷移する
   void navigateToCreateProject(BuildContext context) {
-    context.go('/create_project');
+    context.go(CommonConstants.routeCreateProject);
   }
 
   // ------------ イベント ------------

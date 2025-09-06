@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:positos_frontend_app/const/common_const.dart';
 
 import 'package:positos_frontend_app/widgets/common_app_bar.dart';
 import 'package:positos_frontend_app/providers/project_providers.dart';
@@ -83,7 +84,7 @@ class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
 
     // 画面遷移など
     if (!mounted) return;
-    context.go('/project/${response.projectId}');
+    context.go('${CommonConstants.routeProject}/${response.projectId}');
   }
 
   // ------------ 処理 ------------
