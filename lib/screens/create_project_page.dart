@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:positos_frontend_app/widgets/common_app_bar.dart';
-
 import 'package:positos_frontend_app/providers/project_providers.dart';
 import 'package:positos_frontend_app/services/project_service.dart';
 import 'package:positos_frontend_app/models/project.dart';
@@ -54,7 +54,7 @@ class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
   // ------------ イベント ------------
 
   // プロジェクト作成ボタン押下イベント
-  onClickCreateProjectButton() {
+  void onClickCreateProjectButton() {
     createProject();
   }
 
@@ -83,7 +83,7 @@ class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
 
     // 画面遷移など
     if (!mounted) return;
-    Navigator.pushNamed(context, '/project/${response.projectId}');
+    context.go('/project/${response.projectId}');
   }
 
   // ------------ 処理 ------------

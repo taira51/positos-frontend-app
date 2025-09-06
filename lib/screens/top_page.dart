@@ -1,18 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:positos_frontend_app/widgets/common_app_bar.dart';
+import 'package:go_router/go_router.dart';
+import 'package:web/web.dart' as web;
+import 'dart:convert';
 
-class TopPage extends StatelessWidget {
+class TopPage extends StatefulWidget {
   const TopPage({super.key});
 
+  @override
+  State<TopPage> createState() => _TopPageState();
+}
+
+class _TopPageState extends State<TopPage> {
+  // 参加したプロジェクト一覧
+  List<String> joinedProjectList = [];
+
+  // ------------ ライフサイクル ------------
+
+  // 初期化（ライフサイクル）
+  @override
+  void initState() {
+    super.initState();
+
+    // 参加したプロジェクト一覧をローカルストレージから取得
+    final joinedProject = web.window.localStorage['joined_project'];
+
+    setState(() {
+      if (joinedProject != null) {
+        joinedProjectList = List<String>.from(jsonDecode(joinedProject));
+      }
+    });
+  }
+
+  // ------------ ライフサイクル ------------
+  // ------------ イベント ------------
+
   // プロジェクト作成ボタン押下イベント
-  onClickCreateProjectButton(BuildContext context) {
+  void onClickCreateProjectButton(BuildContext context) {
     navigateToCreateProject(context);
   }
 
   // プロジェクト作成ページに遷移する
   void navigateToCreateProject(BuildContext context) {
-    Navigator.pushNamed(context, '/create_project');
+    context.go('/create_project');
   }
+
+  // ------------ イベント ------------
 
   @override
   Widget build(BuildContext context) {
@@ -66,6 +99,34 @@ class TopPage extends StatelessWidget {
                     ),
                   ),
                 ),
+                const SizedBox(height: 48),
+                joinedProjectList.isNotEmpty
+                    ? const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          '参加したプロジェクト',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      )
+                    : // 何も表示しない
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: joinedProjectList.length,
+                          itemBuilder: (context, index) {
+                            final projectId = joinedProjectList[index];
+                            return ListTile(
+                              leading: const Icon(Icons.folder),
+                              title: Text('Project ID: $projectId'),
+                              onTap: () {
+                                // TODO プロジェクト画面に遷移など
+                              },
+                            );
+                          },
+                        ),
+                      ),
               ],
             ),
           ),

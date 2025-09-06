@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 /// 共通appBar
 /// showBackButton 戻るボタン表示制御（trueで表示する）
@@ -10,7 +11,7 @@ PreferredSizeWidget buildCommonAppBar({
     automaticallyImplyLeading: showBackButton,
     title: GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, '/');
+        context.go('/');
       },
       child: const Text(
         'Positos',
@@ -26,16 +27,16 @@ PreferredSizeWidget buildCommonAppBar({
     elevation: 0,
     actions: [
       TextButton(
-        onPressed: () => Navigator.pushNamed(context, '/login'),
+        onPressed: () => context.go('/login'),
         child: const Text('ログイン'),
       ),
       TextButton(
-        onPressed: () => Navigator.pushNamed(context, '/signup'),
+        onPressed: () => context.go('/signup'),
         child: const Text('会員登録'),
       ),
       IconButton(
         icon: const Icon(Icons.settings),
-        onPressed: () => Navigator.pushNamed(context, '/settings'),
+        onPressed: () => context.go('/settings'),
       ),
     ],
   );
