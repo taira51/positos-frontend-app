@@ -26,8 +26,4 @@ class CommonConstants {
   // ---- PathParameters ----
   /// プロジェクトID
   static const String pathParameterProjectId = 'projectId';
-
-  // ---- LocalStorage Keys ----
-  /// 参加したプロジェクト
-  static const String storageJoinedProject = 'joined_project';
 }

@@ -7,9 +7,16 @@ class ApiService {
   static const String baseUrl = 'http://localhost:8000';
   static const headers = {'Content-Type': 'application/json'};
 
-  // 取得
+  // 全件取得
   Future<List<dynamic>> get(String endpoint) async {
     final response = await http.get(Uri.parse('$baseUrl$endpoint'));
+    handleError(response);
+    return jsonDecode(utf8.decode(response.bodyBytes));
+  }
+
+  // 1件取得（キー）
+  Future<dynamic> getById(String endpoint, String id) async {
+    final response = await http.get(Uri.parse('$baseUrl$endpoint/$id'));
     handleError(response);
     return jsonDecode(utf8.decode(response.bodyBytes));
   }

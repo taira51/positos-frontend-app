@@ -12,6 +12,12 @@ class ProjectService {
   // コンストラクタ
   ProjectService({required this.api});
 
+  // プロジェクト1件取得
+  Future<Project> getProject(String projectId) async {
+    final data = await api.getById(projectUrl, projectId);
+    return Project.fromJson(data);
+  }
+
   // プロジェクト作成
   Future<Project> createProject(Project project) async {
     final data = await api.post(projectUrl, project.toJson());

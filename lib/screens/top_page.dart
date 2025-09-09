@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:positos_frontend_app/models/joined_project.dart';
+
+import 'package:positos_frontend_app/utils/shared_preferences_project_id_storage.dart';
 import 'package:positos_frontend_app/const/common_const.dart';
 import 'package:positos_frontend_app/widgets/common_app_bar.dart';
-import 'package:go_router/go_router.dart';
-import 'package:web/web.dart' as web;
-import 'dart:convert';
 
 class TopPage extends StatefulWidget {
   const TopPage({super.key});
@@ -14,7 +15,7 @@ class TopPage extends StatefulWidget {
 
 class _TopPageState extends State<TopPage> {
   // 参加したプロジェクト一覧
-  List<String> joinedProjectList = [];
+  List<JoinedProject> joinedProjectList = [];
 
   // ------------ ライフサイクル ------------
 
@@ -23,14 +24,8 @@ class _TopPageState extends State<TopPage> {
   void initState() {
     super.initState();
 
-    // 参加したプロジェクト一覧をローカルストレージから取得
-    final joinedProject = web.window.localStorage.getItem('joined_project');
-
-    setState(() {
-      if (joinedProject != null) {
-        joinedProjectList = List<String>.from(jsonDecode(joinedProject));
-      }
-    });
+    // 初期表示ロード
+    _loadProjects();
   }
 
   // ------------ ライフサイクル ------------
@@ -47,6 +42,18 @@ class _TopPageState extends State<TopPage> {
   }
 
   // ------------ イベント ------------
+  // ------------ 処理 ------------
+
+  // 初期表示ロード
+  Future<void> _loadProjects() async {
+    // 参加したプロジェクト一覧をローカルストレージから取得
+    final projects = await SharedPreferencesProjectIdStorage.getAll();
+    setState(() {
+      joinedProjectList = projects;
+    });
+
+    // ------------ 処理 ------------
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,14 +108,21 @@ class _TopPageState extends State<TopPage> {
                   ),
                 ),
                 const SizedBox(height: 48),
-                joinedProjectList.isNotEmpty
-                    ? const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          '参加したプロジェクト',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    '参加したプロジェクト',
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                  ),
+                ),
+                joinedProjectList.isEmpty
+                    ? const Padding(
+                        padding: EdgeInsetsGeometry.only(top: 12, left: 12),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'まだ参加したプロジェクトはありません。',
+                            style: TextStyle(fontSize: 15),
                           ),
                         ),
                       )
@@ -117,10 +131,10 @@ class _TopPageState extends State<TopPage> {
                         child: ListView.builder(
                           itemCount: joinedProjectList.length,
                           itemBuilder: (context, index) {
-                            final projectId = joinedProjectList[index];
+                            final joinedPproject = joinedProjectList[index];
                             return ListTile(
                               leading: const Icon(Icons.folder),
-                              title: Text('Project ID: $projectId'),
+                              title: Text(joinedPproject.projectName),
                               onTap: () {
                                 // TODO プロジェクト画面に遷移など
                               },
